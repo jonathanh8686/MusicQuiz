@@ -28,8 +28,8 @@ button {
 }
 
 .anim-typewriter{
-  animation: typewriter 0.7s steps(11) 0.2s 1 normal both,
-             blinkTextCursor 500ms steps(44) normal both;
+  animation: typewriter 0.7s steps(11) 0.1s 1 normal both,
+             blinkTextCursor 500ms steps(11) normal both;
 }
 @keyframes typewriter{
   from{width: 0;}
