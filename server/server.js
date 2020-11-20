@@ -53,14 +53,10 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
             console.log(
               `Adding data ${JSON.stringify(req.body)} to room ${roomid}`
             );
-            db.collection("room-codes")
-              .insertOne({"roomid": roomid})
-
-            res.json({"roomid": roomid});
+            db.collection("room-codes").insertOne({ roomid: roomid });
+            res.json({ roomid: roomid });
           })
           .catch((error) => console.error(error));
-
-
       })
       .catch((error) => console.error(error));
   });
