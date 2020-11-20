@@ -9,6 +9,9 @@ import Collapse from "@material-ui/core/Collapse";
 import GameIDInput from "./GameIDInput.jsx";
 import CreateLobby from "./CreateLobby.jsx";
 
+const API_IP = "127.0.0.1";
+const SITE_IP = "127.0.0.1"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -43,11 +46,34 @@ const TitleScreen = ({}) => {
   function enteredJoinCode(e) {
     setJoinCode(e);
     console.log("Joining lobby code: " + e);
+
+    fetch(`http://${API_IP}:3001/room-codes`).then((response) =>
+      response.json()
+    ).then(data => {
+      let found = false;
+      for(var i = 0; i < data.length; i++) {
+        if(data[i]["roomid"] == e) found = true;
+      }
+      if(found) {
+        window.location.href = `http://${SITE_IP}:3000/${e}`;
+      }
+    });
   }
 
   function enteredCreateLobby(e) {
     setNewLobby(e);
     console.log("Creating new lobby with properties: " + JSON.stringify(e));
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newLobby),
+    };
+    fetch(`http://${API_IP}:3001/add-room`, requestOptions).then((response) =>
+      response.json()
+    ).then(data => {
+      window.location.href = `http://${SITE_IP}:3000/${data["roomid"]}`;
+    });
   }
 
   return (

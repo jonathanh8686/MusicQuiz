@@ -49,7 +49,7 @@ const GameIDInput = (props) => {
           InputProps={{ disableUnderline: true }}
         />
 
-        <Button className={classes.goButton} variant="contained">
+      <Button className={classes.goButton} variant="contained" onClick={handleSubmit}>
           Go!
         </Button>
       </form>

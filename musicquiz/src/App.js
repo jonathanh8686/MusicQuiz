@@ -10,6 +10,7 @@ import {
 
 import IndexPage from './Pages/Index.jsx';
 import AboutPage from './Pages/About.jsx';
+import GamePage from './Pages/Game.jsx';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
               <Switch>
                   <Route exact path="/"><IndexPage/></Route>
                   <Route path="/about"><AboutPage/></Route>
+                  <Route path="/:id" component={GamePage}></Route>
               </Switch>
 
           </Router>

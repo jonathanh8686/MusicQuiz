@@ -1,0 +1,32 @@
+{
+  "name": "musicquiz",
+  "version": "1.0.0",
+  "description": "A MusicQuiz web application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanh8686/MusicQuiz.git"
+  },
+  "author": "Jonathan Hsieh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jonathanh8686/MusicQuiz/issues"
+  },
+  "homepage": "https://github.com/jonathanh8686/MusicQuiz#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "moment": "^2.29.1",
+    "mongodb": "^3.6.3",
+    "socket.io": "^3.0.3"
+  }
+}
