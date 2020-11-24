@@ -22,6 +22,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
 const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: "#455273",
@@ -54,6 +56,7 @@ const tableStyle = {
 const Chat = (props) => {
   const classes = useStyles();
 
+  var currMessageKey = 0;
   const [inputState, setInputState] = useState("");
 
   function handleSubmit(e) {
@@ -61,6 +64,15 @@ const Chat = (props) => {
     e.preventDefault();
     if(inputState == "") return;
     props.send_message(inputState);
+  }
+
+  function renderRow(row){
+    currMessageKey = currMessageKey + 1;
+    return <StyledTableRow key={currMessageKey}>
+      <StyledTableCell component="th" scope="row">
+        {row["message"]["user"]}: {row["message"]["message"]}
+      </StyledTableCell>
+    </StyledTableRow>
   }
 
   return (
@@ -73,13 +85,7 @@ const Chat = (props) => {
             style={tableStyle}
           >
             <TableBody>
-              {props.messages.map((row) => (
-                <StyledTableRow key={row["message"]["message"]}>
-                  <StyledTableCell component="th" scope="row">
-                    {row["message"]["user"]}: {row["message"]["message"]}
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
+              {props.messages.map((row) => renderRow(row))}
             </TableBody>
           </Table>
         </TableContainer>

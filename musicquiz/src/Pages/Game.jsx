@@ -49,7 +49,6 @@ const GamePage = ({ match }) => {
   function updateMessages(data) {
     console.log("Chat Event:", data.message);
     if (data["type"] == "new_message") {
-      
       setMessages(messages => [...messages, data]);
     }
   }
