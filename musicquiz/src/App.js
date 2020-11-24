@@ -1,4 +1,5 @@
 import React from 'react';
+import './tailwind.output.css';
 import {
     BrowserRouter as Router,
     HashRouter,

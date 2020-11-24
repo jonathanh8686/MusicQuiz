@@ -51,23 +51,26 @@ const OnlineList = (props) => {
 
   console.log(props.onlinePlayers);
   return (
-    <div className="tablediv" style={{ overflow: "auto", maxHeight:"90%" }}>
+    <div className="tablediv">
       <TableContainer component={Paper} style={{borderRadius: 15}}>
         <Table className={classes.table} aria-label="customized table" style={tableStyle}>
           <TableHead>
             <TableRow>
-              <StyledTableCell>Nickname</StyledTableCell>
+              <StyledTableCell><span className="font-bold">Players</span></StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {props.onlinePlayers.map((row) => (
-              <StyledTableRow key={row}>
-                <StyledTableCell component="th" scope="row">
-                  {row}
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
+          <div style={{ overflow: "auto", maxHeight:"20vh", width:"100%"}} >
+            <TableBody className="flex flex-col" style={{display:"flex", borderBottom:"none", overflow: "auto", maxHeight:"20vh",}}>
+              {props.onlinePlayers.map((row) => (
+                <StyledTableRow key={row} >
+                  <StyledTableCell className="w-full" style={{padding: "8px", paddingLeft: "12px"}} component="th" scope="row">
+                    <span className="font-light text-lg">{row}</span>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </div>
+          
         </Table>
       </TableContainer>
     </div>

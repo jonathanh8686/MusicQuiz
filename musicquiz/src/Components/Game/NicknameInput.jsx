@@ -25,14 +25,17 @@ const NicknameInput = (props) => {
 
   return (
     <div>
-      <form className={classes.inputBox} noValidate autoComplete="off" onSubmit={(e) => {e.preventDefault();}}>
-        <TextField
-          label="Nickname"
-          variant="filled"
-          onChange={inputChanged}
-          defaultValue={props.currentNick}
-          InputProps={{ disableUnderline: true }}
-        />
+      <form className="w-auto bg-transparent" noValidate autoComplete="off" onSubmit={(e) => {e.preventDefault();}}>
+        <div className="mb-3 bg-white border-4 rounded-2xl">
+          <TextField
+            className="w-full"
+            label="Nickname"
+            variant="filled"
+            onChange={inputChanged}
+            defaultValue={props.currentNick}
+            InputProps={{ disableUnderline: true }}
+          />
+        </div>
       </form>
     </div>
   );

@@ -80,21 +80,21 @@ const GamePage = ({ match }) => {
     <div>
       {/* Button for testing purposes */}
       {/* <button onClick={() => console.log(messages)}>View Messages</button> */}
-      <div class="wrapper">
-        <aside class="aside aside-1">
+      <div class="flex flex-col sm:flex-row items-center">
+        <aside class="aside aside-1 mx-3 mb-4">
           <NicknameInput
             currentNick={nickname}
             setNickname={updateNickname}
           ></NicknameInput>
           <OnlineList onlinePlayers={players}> </OnlineList>
         </aside>
-        <aside class="aside aside-2">
+        <aside class="aside aside-2 mr-3">
           <Chat messages={messages} send_message={sendMessage}></Chat>
         </aside>
-        <footer class="footer">
+      </div>
+      <footer class="footer">
           <p> Game Code: {id} </p>
         </footer>
-      </div>
     </div>
   );
 };

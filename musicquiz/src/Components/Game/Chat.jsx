@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import Paper from "@material-ui/core/Paper";
@@ -75,9 +75,17 @@ const Chat = (props) => {
     </StyledTableRow>
   }
 
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(scrollToBottom, [props.messages]);
+
   return (
-    <div>
-      <div class="tablediv" style={{ overflow: "auto", maxHeight: "70%" }}>
+    <div className="flex flex-col items-center">
+      <div class="tablediv w-full sm:w-4/5" style={{ overflow: "auto", maxHeight: "40vh" }}>
         <TableContainer component={Paper} style={{ borderRadius: 15 }}>
           <Table
             className={classes.table}
@@ -86,6 +94,7 @@ const Chat = (props) => {
           >
             <TableBody>
               {props.messages.map((row) => renderRow(row))}
+              <div ref={messagesEndRef} />
             </TableBody>
           </Table>
         </TableContainer>

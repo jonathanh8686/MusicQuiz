@@ -8,7 +8,7 @@ import Collapse from "@material-ui/core/Collapse";
 
 import GameIDInput from "./GameIDInput.jsx";
 import CreateLobby from "./CreateLobby.jsx";
-
+import "tailwindcss/tailwind.css"
 const API_IP = "127.0.0.1";
 const SITE_IP = "127.0.0.1"
 
@@ -79,16 +79,19 @@ const TitleScreen = ({}) => {
   return (
     <div>
       <h1 class="line-1 anim-typewriter"> Music Quiz </h1>
-      <Zoom in={true} style={{ transitionDelay: "600ms" }}>
-        <Button
-          className={classes.optionButtons}
-          variant="contained"
-          color="primary"
-          onClick={joinLobby}
-        >
-          Join Lobby
-        </Button>
-      </Zoom>
+      <div>
+        <Zoom in={true} style={{ transitionDelay: "600ms" }}>
+          <Button
+            className={classes.optionButtons}
+            variant="contained"
+            color="primary"
+            onClick={joinLobby}
+          >
+            Join Lobby
+          </Button>
+        </Zoom>
+      </div>
+      
 
       <Collapse in={showJoin}>
         <GameIDInput passJoinCode={enteredJoinCode}></GameIDInput>
