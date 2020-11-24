@@ -61,23 +61,7 @@ const GamePage = ({ match }) => {
       }
     });
 
-    socket.on("chat_events", function (data) {
-      console.log("Chat Event:", data);
-      if (data["type"] == "new_message") {
-        let newmessages = [];
-        for (var i = 0; i < messages.length; i++) {
-          newmessages.push(messages[i]);
-        }
 
-
-        console.log("new messages");
-        console.log(newmessages);
-        newmessages.push(data);
-        console.log(newmessages);
-        setMessages(newmessages, (e) => {console.log("LKOOOK")});
-        console.log(messages);
-      }
-    });
 
     return () => {
       // Anything in here is fired on component unmount.
@@ -85,6 +69,26 @@ const GamePage = ({ match }) => {
       socket.off();
     };
   }, []);
+
+  useEffect(() => {
+    socket.on("chat_events", function (data) {
+      console.log("Chat Event:", data);
+      if (data["type"] == "new_message") {
+        let newmessages = [];
+        for (var i = 0; i < messages.length; i++) {
+          newmessages.push(messages[i]);
+        }
+        console.log(messages);
+
+        console.log("new messages");
+        console.log(newmessages);
+        newmessages.push(data);
+        console.log([...messages, data]);
+        setMessages([...messages, data]);
+        console.log(messages);
+      }
+    });
+}, [messages]);
 
   return (
     <div>
