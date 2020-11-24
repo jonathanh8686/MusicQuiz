@@ -51,7 +51,7 @@ const OnlineList = (props) => {
 
   console.log(props.onlinePlayers);
   return (
-    <div class="tablediv" style={{ overflow: "auto", maxHeight:"90%" }}>
+    <div className="tablediv" style={{ overflow: "auto", maxHeight:"90%" }}>
       <TableContainer component={Paper} style={{borderRadius: 15}}>
         <Table className={classes.table} aria-label="customized table" style={tableStyle}>
           <TableHead>

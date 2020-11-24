@@ -31,20 +31,6 @@ const GamePage = ({ match }) => {
   const [nickname, setNickname] = useState(generateRandomAnimalName());
   const [messages, setMessages] = useState([]);
 
-  socket.on("chat_events", function (data) {
-    console.log("Chat Event:", data);
-    if (data["type"] == "new_message") {
-      setMessages([...messages, data]);
-    }
-  });
-
-  socket.on("room_events", function (data) {
-    console.log("Room Event:", data);
-    if (data["type"] == "playerlist") {
-      setPlayers(data["players"]);
-    }
-  });
-
   function updateNickname(e) {
     let flag = false;
     for (var i = 0; i < players.length; i++) {
@@ -60,11 +46,27 @@ const GamePage = ({ match }) => {
     socket.emit("new-message", { room: id, user: nickname, message: e });
   }
 
+  function updateMessages(data) {
+    console.log("Chat Event:", data);
+    if (data["type"] == "new_message") {
+      setMessages([...messages, data]);
+    }
+  }
+
   // on mount
   useEffect(() => {
     //socket.emit("connection", "joined");
     socket.on("connect", function () {
       socket.emit("join-room", { room: id, user: nickname });
+    });
+
+    socket.on("chat_events", updateMessages);
+
+    socket.on("room_events", function (data) {
+      console.log("Room Event:", data);
+      if (data["type"] == "playerlist") {
+        setPlayers(data["players"]);
+      }
     });
 
     return () => {

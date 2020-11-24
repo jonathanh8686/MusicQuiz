@@ -57,10 +57,11 @@ const Chat = (props) => {
   const [inputState, setInputState] = useState("");
 
   function handleSubmit(e) {
-    if(inputState == "") return;
+
 
     setInputState("");
     e.preventDefault();
+    if(inputState == "") return;
     props.send_message(inputState);
   }
 
