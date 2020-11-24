@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import io from "socket.io-client";
 import { Grid, Col } from "gymnast";
 
-
 import "./Game.css";
 
 import OnlineList from "../Components/Game/OnlineList.jsx";
@@ -32,6 +31,20 @@ const GamePage = ({ match }) => {
   const [nickname, setNickname] = useState(generateRandomAnimalName());
   const [messages, setMessages] = useState([]);
 
+  socket.on("chat_events", function (data) {
+    console.log("Chat Event:", data);
+    if (data["type"] == "new_message") {
+      setMessages([...messages, data]);
+    }
+  });
+
+  socket.on("room_events", function (data) {
+    console.log("Room Event:", data);
+    if (data["type"] == "playerlist") {
+      setPlayers(data["players"]);
+    }
+  });
+
   function updateNickname(e) {
     let flag = false;
     for (var i = 0; i < players.length; i++) {
@@ -44,7 +57,7 @@ const GamePage = ({ match }) => {
   }
 
   function sendMessage(e) {
-    socket.emit("new-message", {room: id, user: nickname, message: e});
+    socket.emit("new-message", { room: id, user: nickname, message: e });
   }
 
   // on mount
@@ -54,41 +67,12 @@ const GamePage = ({ match }) => {
       socket.emit("join-room", { room: id, user: nickname });
     });
 
-    socket.on("room_events", function (data) {
-      console.log("Room Event:", data);
-      if (data["type"] == "playerlist") {
-        setPlayers(data["players"]);
-      }
-    });
-
-
-
     return () => {
       // Anything in here is fired on component unmount.
       //socket.emit("disconnect");
       socket.off();
     };
   }, []);
-
-  useEffect(() => {
-    socket.on("chat_events", function (data) {
-      console.log("Chat Event:", data);
-      if (data["type"] == "new_message") {
-        let newmessages = [];
-        for (var i = 0; i < messages.length; i++) {
-          newmessages.push(messages[i]);
-        }
-        console.log(messages);
-
-        console.log("new messages");
-        console.log(newmessages);
-        newmessages.push(data);
-        console.log([...messages, data]);
-        setMessages([...messages, data]);
-        console.log(messages);
-      }
-    });
-}, [messages]);
 
   return (
     <div>
@@ -102,9 +86,10 @@ const GamePage = ({ match }) => {
         </aside>
         <aside class="aside aside-2">
           <Chat messages={messages} send_message={sendMessage}></Chat>
-
         </aside>
-        <footer class="footer"><p> Game Code: {id} </p></footer>
+        <footer class="footer">
+          <p> Game Code: {id} </p>
+        </footer>
       </div>
     </div>
   );

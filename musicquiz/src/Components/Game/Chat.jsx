@@ -8,13 +8,14 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { TextField } from "@material-ui/core";
-import useDeepCompareEffect from 'use-deep-compare-effect'
+import useDeepCompareEffect from "use-deep-compare-effect";
 
 const useStyles = makeStyles((theme) => ({
   inputBox: {
     "& > *": {
       margin: theme.spacing(1),
       width: "400px",
+      maxWidth: "400px",
       background: "#ffffff",
       borderRadius: 20,
     },
@@ -56,6 +57,8 @@ const Chat = (props) => {
   const [inputState, setInputState] = useState("");
 
   function handleSubmit(e) {
+    if(inputState == "") return;
+
     setInputState("");
     e.preventDefault();
     props.send_message(inputState);
@@ -74,7 +77,7 @@ const Chat = (props) => {
               {props.messages.map((row) => (
                 <StyledTableRow key={row["message"]["message"]}>
                   <StyledTableCell component="th" scope="row">
-                    {row["message"]["message"]}
+                    {row["message"]["user"]}: {row["message"]["message"]}
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
