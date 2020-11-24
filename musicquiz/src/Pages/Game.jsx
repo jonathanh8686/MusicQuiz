@@ -47,9 +47,10 @@ const GamePage = ({ match }) => {
   }
 
   function updateMessages(data) {
-    console.log("Chat Event:", data);
+    console.log("Chat Event:", data.message);
     if (data["type"] == "new_message") {
-      setMessages([...messages, data]);
+      
+      setMessages(messages => [...messages, data]);
     }
   }
 
@@ -78,6 +79,8 @@ const GamePage = ({ match }) => {
 
   return (
     <div>
+      {/* Button for testing purposes */}
+      {/* <button onClick={() => console.log(messages)}>View Messages</button> */}
       <div class="wrapper">
         <aside class="aside aside-1">
           <NicknameInput
