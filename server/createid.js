@@ -13,4 +13,16 @@ module.exports = {
 
     return rtn;
   },
+
+  getRandID: function () {
+    return randCons() + randVowel() + randCons() + randVowel() + randCons();
+  },
+  randCons: function () {
+    consonants = "bcdfghjklmnpqrstvwxyz";
+    return consonants.charAt(Math.random() % consonants.length);
+  },
+  randVowel: function () {
+    vowels = "aeiou";
+    return vowels.charAt(Math.random() % vowels.length);
+  },
 };
