@@ -22,8 +22,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-
 const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: "#455273",
@@ -62,30 +60,35 @@ const Chat = (props) => {
   function handleSubmit(e) {
     setInputState("");
     e.preventDefault();
-    if(inputState == "") return;
+    if (inputState == "") return;
     props.send_message(inputState);
   }
 
-  function renderRow(row){
+  function renderRow(row) {
     currMessageKey = currMessageKey + 1;
-    return <StyledTableRow key={currMessageKey}>
-      <StyledTableCell component="th" scope="row">
-        {row["message"]["user"]}: {row["message"]["message"]}
-      </StyledTableCell>
-    </StyledTableRow>
+    return (
+      <StyledTableRow key={currMessageKey}>
+        <StyledTableCell component="th" scope="row">
+          {row["message"]["user"]}: {row["message"]["message"]}
+        </StyledTableCell>
+      </StyledTableRow>
+    );
   }
 
-  const messagesEndRef = useRef(null)
+  const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(scrollToBottom, [props.messages]);
 
   return (
     <div className="flex flex-col items-center">
-      <div class="tablediv w-full sm:w-4/5" style={{ overflow: "auto", maxHeight: "40vh" }}>
+      <div
+        class="tablediv w-full sm:w-4/5"
+        style={{ overflow: "auto", maxHeight: "40vh" }}
+      >
         <TableContainer component={Paper} style={{ borderRadius: 15 }}>
           <Table
             className={classes.table}

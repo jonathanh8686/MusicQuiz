@@ -20,11 +20,6 @@
   width: 100%;
 }
 
-.main {
-  text-align: left;
-  background: deepskyblue;
-}
-
 .aside-1 {
   min-width: 30vw;
   min-height: 35vw;
@@ -42,7 +37,6 @@
 @media all and (min-width: 800px) {
   .main    { flex: 3 0px; }
   .aside-1 { order: 1; }
-  .main    { order: 2; }
   .aside-2 { order: 3; }
   .footer  { order: 4; }
 }

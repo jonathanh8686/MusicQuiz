@@ -154,6 +154,19 @@ io.sockets.on("connection", function (socket) {
     });
   });
 
+  socket.on("game-start", function (data) {
+    console.log(`Room ${data["room"]} started!`);
+
+    //  i think the right model here is that this will send a song over,
+    //  and that after the song is finished on the other side, the client will send
+    //  a "hey song is done" message and then the server will respond with the next song
+  });
+
+  socket.on("song-finished", function (data) {
+    // data should contain the room code that just finished their song
+  });
+
+
   socket.on("disconnect", function () {
     if (!(this.id in idUserRoom)) return;
     data = {

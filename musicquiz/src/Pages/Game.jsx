@@ -8,6 +8,7 @@ import "./Game.css";
 import OnlineList from "../Components/Game/OnlineList.jsx";
 import NicknameInput from "../Components/Game/NicknameInput.jsx";
 import Chat from "../Components/Game/Chat.jsx";
+import MusicProgress from "../Components/Game/MusicProgress.jsx";
 
 const generateRandomAnimalName = require("../../node_modules/random-animal-name-generator");
 
@@ -31,12 +32,14 @@ const GamePage = ({ match }) => {
   const [nickname, setNickname] = useState(generateRandomAnimalName());
   const [messages, setMessages] = useState([]);
 
+  const [gameStarted, setGameStarted] = useState(false);
+
   function updateNickname(e) {
     let flag = false;
     for (var i = 0; i < players.length; i++) {
       if (e.trim() == players[i].trim()) flag = true;
     }
-    if (e.length > 30) flag = true;
+    if (e.length > 30 || e.length == 0) flag = true;
     if (flag) return;
     setNickname(e);
     socket.emit("nickname-updated", { room: id, user: e });
@@ -49,8 +52,14 @@ const GamePage = ({ match }) => {
   function updateMessages(data) {
     console.log("Chat Event:", data.message);
     if (data["type"] == "new_message") {
-      setMessages(messages => [...messages, data]);
+      setMessages((messages) => [...messages, data]);
     }
+  }
+
+  function changeGameStart(e) {
+    setGameStarted(true);
+    socket.emit("game-start", {room: id, user: nickname});
+
   }
 
   // on mount
@@ -80,7 +89,12 @@ const GamePage = ({ match }) => {
     <div>
       {/* Button for testing purposes */}
       {/* <button onClick={() => console.log(messages)}>View Messages</button> */}
+
+      <header>
+        <MusicProgress setGameStarted={changeGameStart}></MusicProgress>
+      </header>
       <div class="flex flex-col sm:flex-row items-center">
+
         <aside class="aside aside-1 mx-3 mb-4">
           <NicknameInput
             currentNick={nickname}
@@ -93,8 +107,8 @@ const GamePage = ({ match }) => {
         </aside>
       </div>
       <footer class="footer">
-          <p> Game Code: {id} </p>
-        </footer>
+        <p> Game Code: {id} </p>
+      </footer>
     </div>
   );
 };
