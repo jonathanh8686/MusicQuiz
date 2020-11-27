@@ -19,18 +19,18 @@ function validateURL(url) {
 }
 
 // -------------- code for testing song guesses ------------------
+function processString(str){
+  const isAlphaNumeric = ch => ch.match(/^[a-z0-9]+$/i) !== null;
+  return str.split("")
+    .filter(char => isAlphaNumeric(char))
+    .map(char => char.toLowerCase())
+    .sort();
+}
+
 function levenstein(purported, actual){
   // ignoring spaces and punctuations
-  const isAlphaNumeric = ch => ch.match(/^[a-z0-9]+$/i) !== null;
-  
-  const processPurported = purported.split("")
-    .filter(char => isAlphaNumeric(char))
-    .map(char => char.toLowerCase())
-    .sort(); // x string
-  const processActual = actual.split("")
-    .filter(char => isAlphaNumeric(char))
-    .map(char => char.toLowerCase())
-    .sort(); // y string
+  const processPurported = processString(purported); // x string
+  const processActual = processString(actual); // y string
 
   // initialize 2D array of dimension len(x) by len(y) [hori by vert]
   var dp = new Array(processActual.length + 1).fill(0).map(
@@ -59,32 +59,48 @@ function levenstein(purported, actual){
   }
 
   const minDistance = dp[processActual.length][processPurported.length];
-  const tolerance = Math.floor(processActual.length / 2);
   // const resultString = minDistance <= tolerance ? "Accepted" : "Declined"
   // console.log(purported.concat(" vs. ").concat(actual));
   // console.log("Min Edit Distance Ignoring Order = ".concat(minDistance));
   // console.log("Tolerance = ".concat(tolerance));
   // console.log("The purported answer is ".concat(resultString).concat("\n\n"));
   //return minDistance;
-  return minDistance <= tolerance;
+  return minDistance
 }
 
 function removeParenExp(str){
-  const parenRegex = /\(([^)]+)\)/;
+var parenRegex = /\(([^)]+)\)/;
   const parenstr = parenRegex.exec(str);
   if (parenstr) return str.replace(parenstr[0], "");
   else return str;
 }
 
-// ! Use this function to test a purported answer with the actual song title !
-function testSongGuess(purported, actual){
-  const processActual = removeParenExp(actual);
-  // console.log(purported.concat(" vs. ").concat(actual))
-  // console.log(levenstein(purported, actual) || levenstein(purported, processActual))
-  // console.log("\n");
-  return levenstein(purported, actual) || levenstein(purported, processActual);
-}
+function testCloseness(purported, actual){
+  // const processPurported = removeParenExp(purported);
+  const noParenActual = removeParenExp(actual);
 
+  // tolerances for the version with parentheses
+  const correctTolerance = Math.ceil(processString(actual).length / 4);
+  const closeTolerance = Math.ceil(processString(actual).length / 2);
+
+  // tolerances for the version without parentheses 
+  const nCorrectTolerance = Math.ceil(processString(noParenActual).length / 4);
+  const nCloseTolerance = Math.ceil(processString(noParenActual).length / 2);
+  
+  const distWithParen = levenstein(purported, actual)
+  const distWithoutParen = levenstein(purported, noParenActual);
+
+  var resultString;
+
+  if (distWithParen <= correctTolerance || distWithoutParen <= nCorrectTolerance)
+      resultString = "correct";
+  else if (distWithParen <= closeTolerance ||  distWithoutParen <= nCloseTolerance)
+      resultString = "close";
+  else 
+    resultString = "incorrect";
+  
+  return resultString;
+}
 // ------------------------------------------------------------------
 
 const http = require("http");
@@ -366,12 +382,16 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
 
     socket.on("new-message", function (data) {
       console.log("Chat event!" + data);
-      // check if it's the right answer
-
-      // check if it's close
       // implement this code once we get the spotify api going
-      // if (testSongGuess(data["purported"], data["actual"])){ // maybe the data should also include a time measurement
-      //   // add score (depending on time?) for the user
+
+      // const guessResult = testCloseness(data["purported"], data["actual"]);
+      // check if it's the right answer
+      // if (testCloseness === "correct"){  
+      //   add score (depending on time?) for the user
+      // }
+      // check if it's close
+      // else if (testCloseness === "close"){
+      //   let the user know their guess was close
       // }
 
       // if not then it's a normal message
