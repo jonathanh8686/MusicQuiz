@@ -30,9 +30,9 @@ const CreateLobby = (props) => {
     props.passLobbySettings(lobbySettings);
   }
 
-  function handleYoutubePlaylistChange(e) {
+  function handlePlaylistChange(e) {
     let newSettings = lobbySettings;
-    lobbySettings["youtube_url"] = e.target.value;
+    lobbySettings["spotify_url"] = e.target.value;
     setLobbySettings(lobbySettings);
   }
 
@@ -46,9 +46,9 @@ const CreateLobby = (props) => {
       >
         <TextField
           InputProps={{ disableUnderline: true }}
-          label="Youtube Playlist URL"
+          label="Spotify Playlist URL"
           variant="filled"
-          onChange={handleYoutubePlaylistChange}
+          onChange={handlePlaylistChange}
         />
 
         <Button

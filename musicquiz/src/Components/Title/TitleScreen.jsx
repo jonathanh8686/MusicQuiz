@@ -50,11 +50,7 @@ const TitleScreen = ({}) => {
     fetch(`http://${API_IP}:3001/room-codes`).then((response) =>
       response.json()
     ).then(data => {
-      let found = false;
-      for(var i = 0; i < data.length; i++) {
-        if(data[i]["roomid"] == e) found = true;
-      }
-      if(found) {
+      if(data.includes(e)) {
         window.location.href = `http://${SITE_IP}:3000/${e}`;
       }
     });
@@ -67,7 +63,7 @@ const TitleScreen = ({}) => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newLobby),
+      body: JSON.stringify(e),
     };
     fetch(`http://${API_IP}:3001/add-room`, requestOptions).then((response) =>
       response.json()
@@ -91,7 +87,7 @@ const TitleScreen = ({}) => {
           </Button>
         </Zoom>
       </div>
-      
+
 
       <Collapse in={showJoin}>
         <GameIDInput passJoinCode={enteredJoinCode}></GameIDInput>

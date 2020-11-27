@@ -41,6 +41,7 @@ const GamePage = ({ match }) => {
     }
     if (e.length > 30 || e.length == 0) flag = true;
     if (flag) return;
+    let oldname = nickname;
     setNickname(e);
     socket.emit("nickname-updated", { room: id, user: e });
   }
@@ -58,8 +59,7 @@ const GamePage = ({ match }) => {
 
   function changeGameStart(e) {
     setGameStarted(true);
-    socket.emit("game-start", {room: id, user: nickname});
-
+    socket.emit("game-start", { room: id, user: nickname });
   }
 
   // on mount
@@ -75,6 +75,8 @@ const GamePage = ({ match }) => {
       console.log("Room Event:", data);
       if (data["type"] == "playerlist") {
         setPlayers(data["players"]);
+      } else if (data["type"] == "info") {
+        setGameStarted(data["started"]);
       }
     });
 
@@ -91,10 +93,12 @@ const GamePage = ({ match }) => {
       {/* <button onClick={() => console.log(messages)}>View Messages</button> */}
 
       <header>
-        <MusicProgress setGameStarted={changeGameStart}></MusicProgress>
+        <MusicProgress
+          gameStarted={gameStarted}
+          setGameStarted={changeGameStart}
+        ></MusicProgress>
       </header>
       <div class="flex flex-col sm:flex-row items-center">
-
         <aside class="aside aside-1 mx-3 mb-4">
           <NicknameInput
             currentNick={nickname}

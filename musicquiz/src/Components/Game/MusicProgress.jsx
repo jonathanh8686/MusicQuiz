@@ -35,7 +35,7 @@ const MusicProgress = (props) => {
 
   return (
     <div>
-      {!gameStarted && (
+      {!props.gameStarted && (
         <Button className={classes.optionButtons} variant="contained" onClick={startGame}>
           Start Game
         </Button>

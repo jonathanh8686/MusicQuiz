@@ -15,14 +15,16 @@ module.exports = {
   },
 
   getRandID: function () {
+    randCons= function () {
+      consonants = "BCDFGHJKLMNPQRSTVWXYZ";
+      return consonants.charAt(Math.floor(Math.random() * consonants.length));
+    }
+    randVowel= function () {
+      vowels = "AEIOU";
+      return vowels.charAt(Math.floor(Math.random() * vowels.length));
+    }
+
     return randCons() + randVowel() + randCons() + randVowel() + randCons();
   },
-  randCons: function () {
-    consonants = "bcdfghjklmnpqrstvwxyz";
-    return consonants.charAt(Math.random() % consonants.length);
-  },
-  randVowel: function () {
-    vowels = "aeiou";
-    return vowels.charAt(Math.random() % vowels.length);
-  },
+
 };
