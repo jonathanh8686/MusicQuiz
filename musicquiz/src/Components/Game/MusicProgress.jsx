@@ -33,10 +33,24 @@ const MusicProgress = (props) => {
     setGameStarted(true); // this is just here to force rerender the component bc idk how to do good things
   }
 
+  function playAudio() {
+    const audioEl = document.getElementsByClassName("audio-element")[0];
+    audioEl.play();
+  }
+
   return (
     <div>
+    <button onClick={playAudio}> play </button>
+      <audio className="audio-element">
+        <source src={props.currentTrack["preview_url"]}></source>
+      </audio>
+
       {!props.gameStarted && (
-        <Button className={classes.optionButtons} variant="contained" onClick={startGame}>
+        <Button
+          className={classes.optionButtons}
+          variant="contained"
+          onClick={startGame}
+        >
           Start Game
         </Button>
       )}

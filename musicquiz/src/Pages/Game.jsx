@@ -32,6 +32,7 @@ const GamePage = ({ match }) => {
   const [nickname, setNickname] = useState(generateRandomAnimalName());
   const [idnickname, setIdNickname] = useState({});
   const [messages, setMessages] = useState([]);
+  const [currentTrack, setCurrentTrack] = useState({});
 
   const [gameStarted, setGameStarted] = useState(false);
 
@@ -78,6 +79,12 @@ const GamePage = ({ match }) => {
         setPlayers(data["players"]);
       } else if (data["type"] == "info") {
         setGameStarted(data["started"]);
+      } else if (data["type"] == "song") {
+        if(data["song"]["preview_url"] == null) { // some songs do not have preview mp3s so we just have to skip them
+          socket.emit("song-finished", {room: id});
+          return;
+        }
+        setCurrentTrack(data["song"]);
       }
     });
 
@@ -97,6 +104,7 @@ const GamePage = ({ match }) => {
         <MusicProgress
           gameStarted={gameStarted}
           setGameStarted={changeGameStart}
+          currentTrack={currentTrack}
         ></MusicProgress>
       </header>
       <div class="flex flex-col sm:flex-row items-center">

@@ -6,6 +6,13 @@ function removePlayer(arr, value) {
   });
 }
 
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 function validateURL(url) {
   let re = new RegExp(
     "[-a-zA-Z0-9@:%._+~#=]{1,256}.[a-zA-Z0-9()]{1,6}([-a-zA-Z0-9()@:%_+.~#?&//=]*)"
@@ -311,7 +318,8 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
         .toArray()
         .then((match_rooms) => {
           let room = match_rooms[0];
-          if(room["players"].some(player => player["user"] === data["user"])) return;
+          if (room["players"].some((player) => player["user"] === data["user"]))
+            return;
 
           db.collection("user-info")
             .find({ socketid: this.id })
@@ -321,7 +329,7 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
               let newplayers = [];
               for (var i = 0; i < room["players"].length; i++) {
                 if (room["players"][i]["socketid"] === this.id) {
-                  newplayers.push({socketid: this.id, user: data["user"]});
+                  newplayers.push({ socketid: this.id, user: data["user"] });
                 } else {
                   newplayers.push(room["players"][i]);
                 }
@@ -367,8 +375,6 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
                 });
             });
         });
-
-
     });
 
     socket.on("new-message", function (data) {
@@ -395,7 +401,10 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
     socket.on("game-start", function (data) {
       console.log(`Room ${data["room"]} started!`);
 
-      db.collection("room-info").updateOne({roomid: data["room"]}, {$set: {started: true}});
+      db.collection("room-info").updateOne(
+        { roomid: data["room"] },
+        { $set: { started: true } }
+      );
       io.sockets.in(data["room"]).emit("room_events", {
         type: "info",
         started: true,
@@ -424,7 +433,24 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
             json: true,
           };
           request.get(options, function (error, response, body) {
-            console.log(body);
+            let tracks = [];
+            for (var i = 0; i < body["items"].length; i++) {
+              tracks.push(body["items"][i]["track"]);
+            }
+            shuffle(tracks);
+            db.collection("room-info")
+              .updateOne(
+                { roomid: room["roomid"] },
+                {
+                  $set: { tracks: tracks },
+                }
+              )
+              .then(() => {
+                io.sockets.in(room["roomid"]).emit("room_events", {
+                  type: "song",
+                  song: tracks[0],
+                });
+              });
           });
         })
         .catch((error) => console.error(error));
@@ -432,6 +458,26 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
 
     socket.on("song-finished", function (data) {
       // data should contain the room code that just finished their song
+      db.collection("room-info")
+        .find({ roomid: data["room"] })
+        .toArray()
+        .then((rooms) => {
+          let room = rooms[0];
+          db.collection("room-info")
+            .updateOne(
+              { roomid: room["roomid"] },
+              {
+                $set: { tracks: room["tracks"].slice(1) },
+              }
+            )
+            .then(() => {
+              console.log(room["tracks"]);
+              io.sockets.in(data["room"]).emit("room_events", {
+                type: "song",
+                song: room["tracks"][0],
+              });
+            });
+        });
     });
 
     socket.on("disconnect", function () {
