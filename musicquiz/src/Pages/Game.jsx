@@ -30,6 +30,7 @@ const GamePage = ({ match }) => {
 
   const [players, setPlayers] = useState([]);
   const [nickname, setNickname] = useState(generateRandomAnimalName());
+  const [idnickname, setIdNickname] = useState({});
   const [messages, setMessages] = useState([]);
 
   const [gameStarted, setGameStarted] = useState(false);
@@ -37,7 +38,7 @@ const GamePage = ({ match }) => {
   function updateNickname(e) {
     let flag = false;
     for (var i = 0; i < players.length; i++) {
-      if (e.trim() == players[i].trim()) flag = true;
+      if (e.trim() == players[i]["user"].trim()) flag = true;
     }
     if (e.length > 30 || e.length == 0) flag = true;
     if (flag) return;

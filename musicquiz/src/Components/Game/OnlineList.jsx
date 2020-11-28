@@ -62,15 +62,15 @@ const OnlineList = (props) => {
           <div style={{ overflow: "auto", maxHeight:"20vh", width:"100%"}} >
             <TableBody className="flex flex-col" style={{display:"flex", borderBottom:"none", overflow: "auto", maxHeight:"20vh",}}>
               {props.onlinePlayers.map((row) => (
-                <StyledTableRow key={row} >
+                <StyledTableRow key={row["socketid"]} >
                   <StyledTableCell className="w-full" style={{padding: "8px", paddingLeft: "12px"}} component="th" scope="row">
-                    <span className="font-light text-lg">{row}</span>
+                    <span className="font-light text-lg">{row["user"]}</span>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
             </TableBody>
           </div>
-          
+
         </Table>
       </TableContainer>
     </div>

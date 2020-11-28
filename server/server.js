@@ -1,8 +1,8 @@
 require("dotenv").config();
 
-function arrayRemove(arr, value) {
+function removePlayer(arr, value) {
   return arr.filter(function (ele) {
-    return ele != value;
+    return ele["socketid"] != value;
   });
 }
 
@@ -19,42 +19,45 @@ function validateURL(url) {
 }
 
 // -------------- code for testing song guesses ------------------
-function processString(str){
-  const isAlphaNumeric = ch => ch.match(/^[a-z0-9]+$/i) !== null;
-  return str.split("")
-    .filter(char => isAlphaNumeric(char))
-    .map(char => char.toLowerCase())
+function processString(str) {
+  const isAlphaNumeric = (ch) => ch.match(/^[a-z0-9]+$/i) !== null;
+  return str
+    .split("")
+    .filter((char) => isAlphaNumeric(char))
+    .map((char) => char.toLowerCase())
     .sort();
 }
 
-function levenstein(purported, actual){
+function levenstein(purported, actual) {
   // ignoring spaces and punctuations
   const processPurported = processString(purported); // x string
   const processActual = processString(actual); // y string
 
   // initialize 2D array of dimension len(x) by len(y) [hori by vert]
-  var dp = new Array(processActual.length + 1).fill(0).map(
-    () => new Array(processPurported.length + 1))
+  var dp = new Array(processActual.length + 1)
+    .fill(0)
+    .map(() => new Array(processPurported.length + 1));
 
   // j is column, i is row
-  for (var j = 0; j < processPurported.length + 1; j ++){
+  for (var j = 0; j < processPurported.length + 1; j++) {
     dp[0][j] = j;
   }
-  for (var i = 0; i < processActual.length + 1; i ++){
+  for (var i = 0; i < processActual.length + 1; i++) {
     dp[i][0] = i;
   }
 
   // if we have computed the first outer "fringe" of edit distances
   // there are processActual.length - 1 more rows to process
 
-  for (var i = 1; i < processActual.length + 1; i ++){
-    for (var j = 1; j < processPurported.length + 1; j ++){
-      const matchCost = (processPurported[j - 1] === processActual[i - 1]) ? 0 : 1;
+  for (var i = 1; i < processActual.length + 1; i++) {
+    for (var j = 1; j < processPurported.length + 1; j++) {
+      const matchCost =
+        processPurported[j - 1] === processActual[i - 1] ? 0 : 1;
       dp[i][j] = Math.min(
-        dp[i-1][j-1] + matchCost, // matching last char of x
-        dp[i-1][j] + 1,           // delete last char of x
-        dp[i][j-1] + 1,           // insert to the end of x
-      )
+        dp[i - 1][j - 1] + matchCost, // matching last char of x
+        dp[i - 1][j] + 1, // delete last char of x
+        dp[i][j - 1] + 1 // insert to the end of x
+      );
     }
   }
 
@@ -65,17 +68,17 @@ function levenstein(purported, actual){
   // console.log("Tolerance = ".concat(tolerance));
   // console.log("The purported answer is ".concat(resultString).concat("\n\n"));
   //return minDistance;
-  return minDistance
+  return minDistance;
 }
 
-function removeParenExp(str){
-var parenRegex = /\(([^)]+)\)/;
+function removeParenExp(str) {
+  var parenRegex = /\(([^)]+)\)/;
   const parenstr = parenRegex.exec(str);
   if (parenstr) return str.replace(parenstr[0], "");
   else return str;
 }
 
-function testCloseness(purported, actual){
+function testCloseness(purported, actual) {
   // const processPurported = removeParenExp(purported);
   const noParenActual = removeParenExp(actual);
 
@@ -83,22 +86,27 @@ function testCloseness(purported, actual){
   const correctTolerance = Math.ceil(processString(actual).length / 4);
   const closeTolerance = Math.ceil(processString(actual).length / 2);
 
-  // tolerances for the version without parentheses 
+  // tolerances for the version without parentheses
   const nCorrectTolerance = Math.ceil(processString(noParenActual).length / 4);
   const nCloseTolerance = Math.ceil(processString(noParenActual).length / 2);
-  
-  const distWithParen = levenstein(purported, actual)
+
+  const distWithParen = levenstein(purported, actual);
   const distWithoutParen = levenstein(purported, noParenActual);
 
   var resultString;
 
-  if (distWithParen <= correctTolerance || distWithoutParen <= nCorrectTolerance)
-      resultString = "correct";
-  else if (distWithParen <= closeTolerance ||  distWithoutParen <= nCloseTolerance)
-      resultString = "close";
-  else 
-    resultString = "incorrect";
-  
+  if (
+    distWithParen <= correctTolerance ||
+    distWithoutParen <= nCorrectTolerance
+  )
+    resultString = "correct";
+  else if (
+    distWithParen <= closeTolerance ||
+    distWithoutParen <= nCloseTolerance
+  )
+    resultString = "close";
+  else resultString = "incorrect";
+
   return resultString;
 }
 // ------------------------------------------------------------------
@@ -198,11 +206,6 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
       .catch((error) => console.error(error));
   });
 
-  let activeRooms = {}; // could combine these
-  let startedGames = [];
-  let idUserRoom = {}; // actually im not even sure if we want any of these
-  // kind of defeats the purpose of having a database lol
-
   io.sockets.on("connection", function (socket) {
     // once a client has connected, we expect to get a ping from them saying what room they want to join
     socket.on("join-room", function (data) {
@@ -231,10 +234,10 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
               { roomid: data["room"] },
               {
                 $set: {
-                  // roomid: room["roomid"],
-                  players: room["players"].concat(data["user"]),
-                  // spotify_url: room["spotify_url"],
-                  // started: room["started"],
+                  players: room["players"].concat({
+                    socketid: this.id,
+                    user: data["user"],
+                  }),
                 },
               }
             )
@@ -248,7 +251,10 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
 
               io.sockets.in(data["room"]).emit("room_events", {
                 type: "playerlist",
-                players: room["players"].concat(data["user"]),
+                players: room["players"].concat({
+                  socketid: this.id,
+                  user: data["user"],
+                }),
               });
 
               io.sockets.in(data["room"]).emit("room_events", {
@@ -270,7 +276,7 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
             socketid: this.id,
           });
 
-          let newplayers = arrayRemove(room["players"], data["user"]);
+          let newplayers = removePlayer(room["players"], this.id);
           db.collection("room-info")
             .updateOne(
               { roomid: data["room"] },
@@ -305,7 +311,7 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
         .toArray()
         .then((match_rooms) => {
           let room = match_rooms[0];
-          if (room["players"].includes(data["user"])) return;
+          if(room["players"].some(player => player["user"] === data["user"])) return;
 
           db.collection("user-info")
             .find({ socketid: this.id })
@@ -314,70 +320,55 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
               let olduser = oldusers[0];
               let newplayers = [];
               for (var i = 0; i < room["players"].length; i++) {
-                if (room["players"][i] === olduser["user"]) {
-                  newplayers.push(data["user"]);
+                if (room["players"][i]["socketid"] === this.id) {
+                  newplayers.push({socketid: this.id, user: data["user"]});
                 } else {
                   newplayers.push(room["players"][i]);
                 }
               }
-              console.log(newplayers);
 
-              db.collection("user-info").updateOne(
-                { socketid: this.id },
-                {
-                  $set: {
-                    socketid: this.id,
-                    user: data["user"],
-                    room: room["roomid"],
-                  },
-                }
-              );
-
-              db.collection("room-info")
+              db.collection("user-info")
                 .updateOne(
-                  { roomid: data["room"] },
+                  { socketid: this.id },
                   {
                     $set: {
-                      roomid: room["roomid"],
-                      players: newplayers,
-                      spotify_url: room["spotify_url"],
-                      started: room["started"],
+                      socketid: this.id,
+                      user: data["user"],
+                      room: room["roomid"],
                     },
                   }
                 )
                 .then(() => {
-                  socket.join(data["room"]);
-                  io.sockets.in(data["room"]).emit("room_events", {
-                    type: "leave",
-                    roomid: data["room"],
-                    user: data["user"],
-                  });
+                  db.collection("room-info")
+                    .updateOne(
+                      { roomid: data["room"] },
+                      {
+                        $set: {
+                          roomid: room["roomid"],
+                          players: newplayers,
+                          spotify_url: room["spotify_url"],
+                          started: room["started"],
+                        },
+                      }
+                    )
+                    .then(() => {
+                      socket.join(data["room"]);
+                      io.sockets.in(data["room"]).emit("room_events", {
+                        type: "leave",
+                        roomid: data["room"],
+                        user: data["user"],
+                      });
 
-                  io.sockets.in(data["room"]).emit("room_events", {
-                    type: "playerlist",
-                    players: newplayers,
-                  });
+                      io.sockets.in(data["room"]).emit("room_events", {
+                        type: "playerlist",
+                        players: newplayers,
+                      });
+                    });
                 });
             });
         });
 
-      if (!(this.id in idUserRoom)) return;
-      if (data["user"] in activeRooms[data["room"]]["players"]) return; // if the new name is already here ignore it
-      let oldname = idUserRoom[this.id]["user"];
-      let newactive = [];
-      for (var i = 0; i < activeRooms[data["room"]].length; i++) {
-        if (activeRooms[data["room"]][i] === oldname) {
-          newactive.push(data["user"]);
-        } else {
-          newactive.push(activeRooms[data["room"]][i]);
-        }
-      }
-      activeRooms[data["room"]] = newactive;
-      idUserRoom[this.id] = { user: data["user"], room: data["room"] };
-      io.sockets.in(data["room"]).emit("room_events", {
-        type: "playerlist",
-        players: activeRooms[data["room"]],
-      });
+
     });
 
     socket.on("new-message", function (data) {
@@ -386,7 +377,7 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
 
       // const guessResult = testCloseness(data["purported"], data["actual"]);
       // check if it's the right answer
-      // if (testCloseness === "correct"){  
+      // if (testCloseness === "correct"){
       //   add score (depending on time?) for the user
       // }
       // check if it's close
@@ -404,10 +395,10 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
     socket.on("game-start", function (data) {
       console.log(`Room ${data["room"]} started!`);
 
-      startedGames.push(data["room"]);
+      db.collection("room-info").updateOne({roomid: data["room"]}, {$set: {started: true}});
       io.sockets.in(data["room"]).emit("room_events", {
         type: "info",
-        started: startedGames.includes(data["room"]),
+        started: true,
       });
 
       //  i think the right model here is that this will send a song over,
@@ -417,14 +408,14 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
       db.collection("room-info")
         .find({ roomid: data["room"] })
         .toArray()
-        .then((results) => {
-          var room_setting = results[0];
+        .then((rooms) => {
+          var room = rooms[0];
 
-          let urlparts = room_setting["spotify_url"].split("/");
+          let urlparts = room["spotify_url"].split("/");
           var list_id = urlparts[urlparts.length - 1];
 
           var options = {
-            url: room_setting["spotify_url"].includes("playlist") // it's either a playlist or an album
+            url: room["spotify_url"].includes("playlist") // it's either a playlist or an album
               ? `https://api.spotify.com/v1/playlists/${list_id}/tracks`
               : `https://api.spotify.com/v1/albums/${list_id}/tracks`,
             headers: {
@@ -458,7 +449,7 @@ MongoClient.connect(process.env.CONNECTIONSTRING, {
               let room = match_rooms[0];
               console.log(room);
 
-              let newplayers = arrayRemove(room["players"], user["user"]);
+              let newplayers = removePlayer(room["players"], user["socketid"]);
               db.collection("room-info")
                 .updateOne(
                   { roomid: user["room"] },
